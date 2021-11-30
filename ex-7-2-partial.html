@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Local Storage</title>
+    <style type="text/CSS">
+        table {
+            width: 90%;
+            border-collapse: collapse;
+            background-color: lightblue;
+            font-family: Perpetua;
+        }
+
+        table, td, th {
+            border: 1px solid black;
+            padding: 4px;
+        }
+
+        th {
+            text-align: center;
+            color: white;
+            background-color: darkblue;
+        }
+
+        tr.oddrow {
+            background-color: white;    
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
+    <script type="text/javascript">
+        let bookUrl, bookTitle, author, year, addItem, removeAll, table;
+        let prefix = "ntou-";
+        let book = {title: "", author: "", year: "", url: ""};
+        function store(index, book){
+            window.localStorage.setItem(index, book);
+        }
+        function add(){
+            if(!bookUrl.value.startsWith("https://www.")) return;
+            let date = new Date();
+            let index = prefix + date.getTime();
+            book.title = bookTitle.value;
+            book.author = author.value;
+            book.year = year.value;
+            book.url = bookUrl.value;
+            data = JSON.stringify(book);
+            store(index, data);
+            show();
+        }
+        function show(){
+            let markup = "<table>", content = "<thead><tr><th>Title</th><th>Author</th><th>Year</th><th>URL</th></tr></thead><tbody>";
+            let arr = new Array();
+            for(index in localStorage){
+                arr.push(index);
+                // arr[index] = item;
+            }
+            arr = arr.sort();
+            for(index of arr){
+                let item = JSON.parse(localStorage.getItem(index));
+                if(item){
+                    content += "<tr><td>" + item.title + 
+                              "</td><td>" + item.author + 
+                              "</td><td>" + item.year +
+                              '</td><td><a href = "' + item.url + '">'+ item.url + '</a>' +
+                              "</td></tr>";
+                }
+            }
+            markup = markup + content + "</tbody><tfoot></tfoot></table>";
+            table.innerHTML = markup;
+        }
+        function clear(){
+            window.localStorage.clear();
+            show();
+            alert("All items were removed!");
+        }
+        function start(){
+            bookUrl = document.getElementById("url");
+            bookTitle = document.getElementById("title");
+            author = document.getElementById("author");
+            year = document.getElementById("year");
+            addItem = document.getElementById("addButton");
+            removeAll = document.getElementById("removeAllButton");
+            table = document.getElementById("display");
+            show();
+            addItem.addEventListener("click", add, false);
+            removeAll.addEventListener("click", clear, false);
+        }
+        window.addEventListener("load", start, false);
+    </script>
+</head>
+
+<body>
+    <form action="#">
+        <p>
+            Book Title:<input id = "title" type = "text">
+            Author(s):<input id = "author" type = "text">
+            Year:<input id = "year" type = "number">
+            Book URL:<input id = "url" type = "url">
+        </p>
+        <p>
+            <input type="button" value="Add New Item" id="addButton">
+            <input type="button" value="Remove All Items" id="removeAllButton">
+        </p>
+    </form>
+    <hr>
+    <div id="display">
+    </div>
+</body>
+</html>
